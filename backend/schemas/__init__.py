@@ -1,3 +1,4 @@
+from backend.schemas.ai import AIAnalysis
 from backend.schemas.contact import (
     AIStatus,
     ContactCategory,
@@ -9,6 +10,7 @@ from backend.schemas.contact import (
 )
 
 __all__ = (
+    "AIAnalysis",
     "AIStatus",
     "ContactCategory",
     "ContactCreate",

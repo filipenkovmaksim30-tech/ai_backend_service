@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     postgresql_password: SecretStr
     postgresql_db: str = Field(min_length=1)
 
+    openai_api_key: SecretStr | None = None
+    openai_model: str = Field(min_length=1)
+    openai_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
+
     @property
     def postgresql_url(self) -> URL:
         return URL.create(
