@@ -34,21 +34,24 @@ class AIResult:
 
 class AIService:
     def __init__(self, settings: Settings) -> None:
-        self._model = settings.openai_model
-
         api_key = (
             settings.openai_api_key.get_secret_value().strip()
             if settings.openai_api_key is not None
             else ""
         )
+        self._model = (
+            settings.openai_model.strip()
+            if settings.openai_model
+            else None
+        )
         self._client = (
             AsyncOpenAI(api_key=api_key, timeout=settings.openai_timeout_seconds, max_retries=1)
-            if api_key
+            if api_key and self._model
             else None
         )
 
     async def analyze(self, comment: str) -> AIResult:
-        if self._client is None:
+        if self._client is None or self._model is None:
             logger.info("OpenAI client is not configured, using fallback")
             return self._fallback(comment)
 

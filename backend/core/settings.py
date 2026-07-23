@@ -1,4 +1,5 @@
-from typing import Self
+from functools import lru_cache
+from typing import Literal, Self
 
 from pydantic import EmailStr, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -20,7 +21,7 @@ class Settings(BaseSettings):
     postgresql_db: str = Field(min_length=1)
 
     openai_api_key: SecretStr | None = None
-    openai_model: str = Field(min_length=1)
+    openai_model: str | None = None
     openai_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
 
     smtp_host: str | None = None
@@ -32,6 +33,18 @@ class Settings(BaseSettings):
     smtp_start_tls: bool = True
     smtp_use_tls: bool = False
     smtp_timeout_seconds: float = Field(default=10.0, gt=0, le=30)
+
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+    log_file: str = "logs/app.log"
+    log_max_bytes: int = Field(default=5_000_000, gt=0)
+    log_backup_count: int = Field(default=5, ge=0)
+
+    rate_limit_requests: int = Field(default=5, gt=0)
+    rate_limit_window_seconds: int = Field(default=900, gt=0)
+    trust_proxy_headers: bool = False
+
+    cors_origins: list[str] = Field(default_factory=list)
+    metrics_api_key: SecretStr | None = None
 
     @model_validator(mode="after")
     def validate_smtp_tls_modes(self) -> Self:
@@ -49,3 +62,8 @@ class Settings(BaseSettings):
             port=self.postgresql_port,
             database=self.postgresql_db,
         )
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

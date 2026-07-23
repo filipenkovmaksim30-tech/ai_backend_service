@@ -14,7 +14,7 @@ class ContactRepository:
             self._session.add(contact)
             await self._session.commit() 
             await self._session.refresh(contact)
-        except SQLAlchemyError as error:
+        except (SQLAlchemyError, OSError) as error:
             await self._session.rollback()
             raise DatabaseOperationError("Database operation failed") from error
         return contact
@@ -26,7 +26,7 @@ class ContactRepository:
 
             await self._session.commit()
             await self._session.refresh(contact)
-        except SQLAlchemyError as error:
+        except (SQLAlchemyError, OSError) as error:
             await self._session.rollback()
             raise DatabaseOperationError(
                 "Database operation failed"

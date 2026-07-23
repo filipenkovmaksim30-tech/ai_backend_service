@@ -2,9 +2,9 @@ from collections.abc import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from backend.core.settings import Settings
+from backend.core.settings import get_settings
 
-settings = Settings()
+settings = get_settings()
 
 async_engine = create_async_engine(
     url=settings.postgresql_url,
