@@ -49,7 +49,7 @@ class AIService:
 
     async def analyze(self, comment: str) -> AIResult:
         if self._client is None:
-            logger.info("OpenAI client is not configured; using fallback")
+            logger.info("OpenAI client is not configured, using fallback")
             return self._fallback(comment)
 
         try:
@@ -71,7 +71,7 @@ class AIService:
             )
         except (OpenAIError, ValidationError) as error:
             logger.warning(
-                "OpenAI analysis failed; using fallback",
+                "OpenAI analysis failed, using fallback",
                 extra={"error_type": type(error).__name__},
             )
             return self._fallback(comment)

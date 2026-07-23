@@ -1,4 +1,6 @@
-from pydantic import Field, SecretStr
+from typing import Self
+
+from pydantic import EmailStr, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
 
@@ -20,6 +22,22 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     openai_model: str = Field(min_length=1)
     openai_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
+
+    smtp_host: str | None = None
+    smtp_port: int = Field(default=587, gt=0, le=65535)
+    smtp_username: str | None = None
+    smtp_password: SecretStr | None = None
+    smtp_sender_email: EmailStr | None = None
+    smtp_owner_email: EmailStr | None = None
+    smtp_start_tls: bool = True
+    smtp_use_tls: bool = False
+    smtp_timeout_seconds: float = Field(default=10.0, gt=0, le=30)
+
+    @model_validator(mode="after")
+    def validate_smtp_tls_modes(self) -> Self:
+        if self.smtp_start_tls and self.smtp_use_tls:
+            raise ValueError("SMTP_START_TLS and SMTP_USE_TLS cannot both be enabled")
+        return self
 
     @property
     def postgresql_url(self) -> URL:
